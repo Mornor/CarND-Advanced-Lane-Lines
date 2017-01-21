@@ -15,6 +15,7 @@ PATH_CAMERA_CAL = './camera_cal/'
 def get_imgpoints_objpoints(calibration_images): 
 	'''
 	Compute the camera calibration matrix and distortion coefficients.
+	@return imgpoint and objpoints
 	'''
 	nx = 9 # nb corner along x axis
 	ny = 6 # nb corner along y axis

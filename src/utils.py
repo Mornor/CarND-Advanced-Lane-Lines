@@ -20,16 +20,16 @@ def get_imgpoints_objpoints(calibration_images):
 	nx = 9 # nb corner along x axis
 	ny = 6 # nb corner along y axis
 
+	# 3D points of the received imaes (from real world). Know object coordinates from the chessboard
+	#  X = (0 -> 7) and Y = (0 -> 5) and Z (always 0 since it is a plane)
+	obj_points = []
+	img_points = [] # 2D points im image plane
+
+	# Create a 6*8 points np array (1, 2, 0) or (2, 4, 0)...
+	objp = np.zeros([ny*nx, 3], np.float32)
+	objp[:,:2] = np.mgrid[0:nx, 0:ny].T.reshape(-1, 2) # Set x and y coordinates
+
 	for image in calibration_images: 
-		# 3D points of the received imaes (from real world). Know object coordinates from the chessboard
-		#  X = (0 -> 7) and Y = (0 -> 5) and Z (always 0 since it is a plane)
-		obj_points = []
-		img_points = [] # 2D points im image plane
-
-		# Create a 6*8 points np array (1, 2, 0) or (2, 4, 0)...
-		objp = np.zeros([ny*nx, 3], np.float32)
-		objp[:,:2] = np.mgrid[0:nx, 0:ny].T.reshape(-1, 2) # Set x and y coordinates
-
 		gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 		# Find the chessboard corner
@@ -42,7 +42,7 @@ def get_imgpoints_objpoints(calibration_images):
 
 	return img_points, obj_points
 
-def undistort_image(img, objpoints, imgpoints):
+def undistort_image(img, objpoints, imgpoints):	
 	'''
 	Takes an image, object points, and image points
 	Performs the camera calibration and image distortion correction
@@ -63,8 +63,15 @@ def load_images(dir_path):
 	return np.array([cv2.imread(dir_path + image) for image in os.listdir(dir_path)])
 
 def plot_image(image): 
-	'''
-	Display a single image
-	'''
 	plt.imshow(image)
+	plt.show()
+
+def plot_diff_src_undist(original_image, undistorted_image):
+	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
+	f.tight_layout()
+	ax1.imshow(original_image)
+	ax1.set_title('Original Image', fontsize=50)
+	ax2.imshow(undistorted_image)
+	ax2.set_title('Undistorted Image', fontsize=50)
+	plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 	plt.show()

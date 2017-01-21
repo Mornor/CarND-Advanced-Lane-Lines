@@ -44,8 +44,8 @@ def get_imgpoints_objpoints(calibration_images):
 def undistort_image(img, objpoints, imgpoints):
 	'''
 	Takes an image, object points, and image points
-	Performs the camera calibration, image distortion correction and 
-	returns the undistorted image
+	Performs the camera calibration and image distortion correction
+	@return the undistorted image
 	'''
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	ret, corners = cv2.findChessboardCorners(gray, (8,6),None)

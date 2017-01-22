@@ -12,6 +12,28 @@ import numpy as np
 # Define constants
 PATH_CAMERA_CAL = './camera_cal/'
 
+def get_tresholded_image(image, thresh_min, thresh_max):
+	'''
+	Apply mask to get threshodled image (Sobel Y and Gradient threshold)
+	@return Thresholded image
+	''' 
+	gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+	# Calcul derivative in the x and y direction
+	sobelx = cv2.Sobel(gray_image, cv2.CV_64F, 1, 0)
+	sobely = cv2.Sobel(gray_image, cv2.CV_64F, 0, 1)
+
+	# Absolute value of the x derivatives, converted to 8 bits
+	abs_sobely = np.absolute(sobely)
+	scaled_sobel = np.uint8(255*abs_sobely/np.max(abs_sobely))
+
+	# Create a binary threshold to select pixels based on gradient strength (here on x direction):
+	sxbinary = np.zeros_like(scaled_sobel)
+	sxbinary[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)] = 1
+
+	return sxbinary
+
+
 def get_imgpoints_objpoints(calibration_images): 
 	'''
 	Compute the camera calibration matrix and distortion coefficients.
@@ -66,12 +88,15 @@ def plot_image(image):
 	plt.imshow(image)
 	plt.show()
 
-def plot_diff_src_undist(original_image, undistorted_image):
+def plot_diff_images(original_image, undistorted_image, gray):
 	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 9))
 	f.tight_layout()
 	ax1.imshow(original_image)
 	ax1.set_title('Original Image', fontsize=30)
-	ax2.imshow(undistorted_image)
-	ax2.set_title('Undistorted Image', fontsize=30)
+	if(gray):
+		ax2.imshow(undistorted_image, cmap='gray')
+	else: 
+		ax2.imshow(undistorted_image)
+	ax2.set_title('Image with Sobel Y', fontsize=30)
 	plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 	plt.show()

@@ -40,17 +40,17 @@ def get_imgpoints_objpoints(calibration_images):
 			img_points.append(corners)
 			obj_points.append(objp)
 
-	return img_points, obj_points
+	return img_points, obj_points, nx, ny
 
-def undistort_image(img, objpoints, imgpoints):	
+def undistort_image(img, objpoints, imgpoints, nx, ny):	
 	'''
 	Takes an image, object points, and image points
 	Performs the camera calibration and image distortion correction
 	@return the undistorted image
 	'''
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-	ret, corners = cv2.findChessboardCorners(gray, (8,6),None)
-	img = cv2.drawChessboardCorners(img, (8,6), corners, ret)
+	ret, corners = cv2.findChessboardCorners(gray, (nx, ny), None)
+	img = cv2.drawChessboardCorners(img, (nx, ny), corners, ret)
 	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
 	dst = cv2.undistort(img, mtx, dist, None, mtx)
 	return dst
@@ -67,11 +67,11 @@ def plot_image(image):
 	plt.show()
 
 def plot_diff_src_undist(original_image, undistorted_image):
-	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
+	f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 9))
 	f.tight_layout()
 	ax1.imshow(original_image)
-	ax1.set_title('Original Image', fontsize=50)
+	ax1.set_title('Original Image', fontsize=30)
 	ax2.imshow(undistorted_image)
-	ax2.set_title('Undistorted Image', fontsize=50)
+	ax2.set_title('Undistorted Image', fontsize=30)
 	plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 	plt.show()

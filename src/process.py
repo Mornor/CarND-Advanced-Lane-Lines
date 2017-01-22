@@ -14,4 +14,4 @@ img_points, obj_points, nx, ny = utils.get_imgpoints_objpoints(calibration_image
 
 # Apply a distortion correction to images
 undistorted_image = utils.undistort_image(calibration_images[4], obj_points, img_points, nx, ny)
-utils.plot_diff_src_undist(calibration_images[4], undistorted_image)
+utils.plot_diff_images(calibration_images[4], undistorted_image)

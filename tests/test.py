@@ -15,7 +15,7 @@ def test_undistort():
 def test_thresholded():
 	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-	thresholded_image = utils.get_tresholded_image(original_image, 20, 100)
+	thresholded_image = utils.get_tresholded_image(original_image, 'y', 20, 100)
 	utils.plot_diff_images(original_image, thresholded_image, True)
 
 # test_undistort()

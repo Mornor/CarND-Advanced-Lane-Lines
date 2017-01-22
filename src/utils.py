@@ -12,7 +12,7 @@ import numpy as np
 # Define constants
 PATH_CAMERA_CAL = './camera_cal/'
 
-def get_tresholded_image(image, thresh_min, thresh_max):
+def get_tresholded_image(image, orientation, thresh_min, thresh_max):
 	'''
 	Apply mask to get threshodled image (Sobel Y and Gradient threshold)
 	@return Thresholded image
@@ -24,14 +24,19 @@ def get_tresholded_image(image, thresh_min, thresh_max):
 	sobely = cv2.Sobel(gray_image, cv2.CV_64F, 0, 1)
 
 	# Absolute value of the x derivatives, converted to 8 bits
-	abs_sobely = np.absolute(sobely)
-	scaled_sobel = np.uint8(255*abs_sobely/np.max(abs_sobely))
+	if(orientation == 'x'):
+		abs_sobel = np.absolute(sobelx)
+	else: 
+		abs_sobel = np.absolute(sobely)
+	
+	scaled_sobel = np.uint8(255*abs_sobel/np.max(abs_sobel))
 
 	# Create a binary threshold to select pixels based on gradient strength (here on x direction):
-	sxbinary = np.zeros_like(scaled_sobel)
-	sxbinary[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)] = 1
+	# Pixel corresponding to the condition provided by thresh_min and thresh_max will be 1. The others, 0. 
+	binary_output = np.zeros_like(scaled_sobel)
+	binary_output[(scaled_sobel >= thresh_min) & (scaled_sobel <= thresh_max)] = 1
 
-	return sxbinary
+	return binary_output
 
 
 def get_imgpoints_objpoints(calibration_images): 

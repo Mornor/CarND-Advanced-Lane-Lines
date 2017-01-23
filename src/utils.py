@@ -44,7 +44,15 @@ def warp(image):
 	# Get the image size
 	image_size = (image.shape[1], image.shape[0])
 
+	plt.imshow(image)
+	plt.plot(710, 460, '.')  # top right
+	plt.plot(1105, 705, '.') # bottom right
+	plt.plot(190, 705, '.')  # bottom left
+	plt.plot(570, 460, '.')  # top left
+	plt.show()
+
 	# src coordinates
+	'''
 	src = np.float32(
 		[[850, 320],   # top right
 		 [865, 450],   # bottom right
@@ -66,6 +74,7 @@ def warp(image):
 	warped = cv2.warpPerspective(image, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
 
 	return warped
+	'''
 
 
 def get_composed_tresholded_image(image):
@@ -205,7 +214,6 @@ def load_images(dir_path):
 
 def plot_image(image): 
 	plt.imshow(image)
-	plt.plot(570, 320, '.')
 	plt.show()
 
 def plot_diff_images(original_image, undistorted_image, gray):

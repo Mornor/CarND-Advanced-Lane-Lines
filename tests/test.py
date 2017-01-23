@@ -41,4 +41,4 @@ def test_get_composed_tresholded_image():
 # test_abs_sobel_thresh()
 # test_mag_thresh()
 # test_dir_threshold()
-test_get_composed_tresholded_image()
+# test_get_composed_tresholded_image()

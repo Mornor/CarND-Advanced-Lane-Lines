@@ -135,7 +135,7 @@ def undistort_image(img, objpoints, imgpoints, nx, ny):
 	'''
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	ret, corners = cv2.findChessboardCorners(gray, (nx, ny), None)
-	#img = cv2.drawChessboardCorners(img, (nx, ny), corners, ret)
+	# img = cv2.drawChessboardCorners(img, (nx, ny), corners, ret)
 	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
 	dst = cv2.undistort(img, mtx, dist, None, mtx)
 	return dst
@@ -160,6 +160,6 @@ def plot_diff_images(original_image, undistorted_image, gray):
 		ax2.imshow(undistorted_image, cmap='gray')
 	else: 
 		ax2.imshow(undistorted_image)
-	ax2.set_title('Image with composed thresholds (0.7, 1.3) \n Udacity test image', fontsize=25)
+	ax2.set_title('Undistorted image without lines', fontsize=25)
 	plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 	plt.show()

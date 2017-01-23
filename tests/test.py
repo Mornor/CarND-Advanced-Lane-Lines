@@ -14,7 +14,7 @@ def test_undistort():
 
 def test_abs_sobel_thresh():
 	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
-	thresholded_image = utils.abs_sobel_thresh(original_image, 'x', sobel_kernel=3, thresh=(20, 100))
+	thresholded_image = utils.abs_sobel_thresh(original_image, 'y', sobel_kernel=3, thresh=(20, 100))
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 	utils.plot_diff_images(original_image, thresholded_image, True)
 
@@ -31,14 +31,14 @@ def test_dir_threshold():
 	utils.plot_diff_images(original_image, thresholded_image, True)
 
 def test_get_composed_tresholded_image():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'udacity_test.png')
 	thresholded_image = utils.get_composed_tresholded_image(original_image)
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 	utils.plot_diff_images(original_image, thresholded_image, True)
 
 
 # test_undistort()
-test_abs_sobel_thresh()
+# test_abs_sobel_thresh()
 # test_mag_thresh()
 # test_dir_threshold()
-# test_get_composed_tresholded_image()
+test_get_composed_tresholded_image()

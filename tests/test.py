@@ -36,9 +36,15 @@ def test_get_composed_tresholded_image():
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 	utils.plot_diff_images(original_image, thresholded_image, True)
 
+def test_perspective_transform():
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
+	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+	perspective_transformed_image = utils.warp(original_image)
+
 
 # test_undistort()
 # test_abs_sobel_thresh()
 # test_mag_thresh()
 # test_dir_threshold()
 # test_get_composed_tresholded_image()
+test_perspective_transform()

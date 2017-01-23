@@ -41,10 +41,23 @@ def test_perspective_transform():
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 	perspective_transformed_image = utils.warp(original_image)
 
+def test_hls():
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
+	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+	hls_image = utils.hls_select(original_image, thresh=(90, 255))
+	utils.plot_diff_images(original_image, hls_image, True)
+
+def test_combine_gradient_color():
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'test5.jpg')
+	hls_image = utils.combine_gradient_color(original_image)
+	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+	utils.plot_diff_images(original_image, hls_image, True)
 
 # test_undistort()
 # test_abs_sobel_thresh()
 # test_mag_thresh()
 # test_dir_threshold()
 # test_get_composed_tresholded_image()
-test_perspective_transform()
+# test_hls()
+test_combine_gradient_color()
+# test_perspective_transform()

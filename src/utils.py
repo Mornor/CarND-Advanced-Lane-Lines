@@ -12,6 +12,34 @@ import numpy as np
 # Define constants
 PATH_CAMERA_CAL = './camera_cal/'
 
+def combine_gradient_color(image):
+	'''
+	Combine gradient thresholds and color space to get the best result.
+	All the techniques are combined to better detect the lines
+ 	[TODO] : Give an undistorded image (BGR) as param
+	'''
+	rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+	# Get the image with combined thresholds applied
+	combined_thresholds_image = get_composed_tresholded_image(image)
+
+	# Get hls image
+	hls_image = hls_select(rgb_image, thresh=(170, 255))
+
+	# Return the combination of both transformation
+	result = np.zeros_like(hls_image)
+	result[(combined_thresholds_image == 1) | (hls_image == 1)] = 1
+	return result
+
+
+# Define a function that thresholds the S-channel of HLS
+def hls_select(img, thresh=(0, 255)):
+    hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
+    s_channel = hls[:,:,2]
+    binary_output = np.zeros_like(s_channel)
+    binary_output[(s_channel > thresh[0]) & (s_channel <= thresh[1])] = 1
+    return binary_output
+
 def warp(image):
 	# Get the image size
 	image_size = (image.shape[1], image.shape[0])
@@ -46,7 +74,7 @@ def get_composed_tresholded_image(image):
 	# Apply each of the thresholding functions
 	gradx = abs_sobel_thresh(image, orientation='x', sobel_kernel=ksize, thresh=(20, 100))
 	grady = abs_sobel_thresh(image, orientation='y', sobel_kernel=ksize, thresh=(20, 100))
-	mag_binary = mag_thresh(image, sobel_kernel=ksize, thresh=(40, 100))
+	mag_binary = mag_thresh(image, sobel_kernel=ksize, thresh=(35, 100))
 	dir_binary = dir_thresh(image, sobel_kernel=ksize, thresh=(0.7, 1.3))
 
 	combined = np.zeros_like(dir_binary)
@@ -189,6 +217,6 @@ def plot_diff_images(original_image, undistorted_image, gray):
 		ax2.imshow(undistorted_image, cmap='gray')
 	else: 
 		ax2.imshow(undistorted_image)
-	ax2.set_title('Undistorted image without lines', fontsize=25)
+	ax2.set_title('Image with combined thresholds\n + Accentuate S space in HLS', fontsize=25)
 	plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 	plt.show()

@@ -12,6 +12,34 @@ import numpy as np
 # Define constants
 PATH_CAMERA_CAL = './camera_cal/'
 
+def warp(image):
+	# Get the image size
+	image_size = (image.shape[1], image.shape[0])
+
+	# src coordinates
+	src = np.float32(
+		[[850, 320],   # top right
+		 [865, 450],   # bottom right
+		 [533, 350],   # bottom left
+		 [535, 210]])  # top left
+
+	# dest coordinates
+	dest = np.float32(
+		[[870, 240],   # top right
+		 [870, 370],   # bottom right
+		 [520, 370],   # bottom left
+		 [520, 240]])  # top left
+
+	# Compute the perspective transform
+	M = cv2.getPerspectiveTransform(src, dst)
+
+	# Create waped image
+	#warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_NEAREST)  # keep same size as input image
+	warped = cv2.warpPerspective(image, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
+
+	return warped
+
+
 def get_composed_tresholded_image(image):
 	ksize = 3 # Choose a larger odd number to smooth gradient measurements
 
@@ -149,6 +177,7 @@ def load_images(dir_path):
 
 def plot_image(image): 
 	plt.imshow(image)
+	plt.plot(570, 320, '.')
 	plt.show()
 
 def plot_diff_images(original_image, undistorted_image, gray):

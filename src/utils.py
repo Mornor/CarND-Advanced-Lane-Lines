@@ -51,39 +51,45 @@ def warp(image):
 	#plt.plot(570, 460, '.')  # top left
 	#plt.show()
 
-	top_right = [740, 460]
-	top_left = [570, 460]
-	bottom_right = [1150, 705]
-	bottom_left = [155, 705]
+	top_right_src = [760, 460]
+	top_left_src = [570, 460]
+	bottom_right_src = [1200, 705]
+	bottom_left_src = [155, 705]
 
-	vertices = np.array([[bottom_left, top_left, top_right, bottom_right]], dtype=np.int32)
+	vertices = np.array([[bottom_left_src, top_left_src, top_right_src, bottom_right_src]], dtype=np.int32)
 	region_of_interest = extract_region_of_interest(image, vertices)
-	plot_image(region_of_interest, True)
+	#plot_image(region_of_interest, True)
 
 	# src coordinates
-	'''
-	src = np.float32(
-		[[850, 320],   # top right
-		 [865, 450],   # bottom right
-		 [533, 350],   # bottom left
-		 [535, 210]])  # top left
+	src = np.float32([
+		 top_right_src,   	# top right
+		 bottom_right_src,  # bottom right
+		 bottom_left_src,   # bottom left
+		 top_left_src		# top left
+	])  	
+
+	top_right_dest = [870, 100]
+	top_left_dest = [155, 100]
+	bottom_right_dest = [870, 705]
+	bottom_left_dest = [155, 705]
 
 	# dest coordinates
-	dest = np.float32(
-		[[870, 240],   # top right
-		 [870, 370],   # bottom right
-		 [520, 370],   # bottom left
-		 [520, 240]])  # top left
+	dst = np.float32([
+		 top_right_dest,   	# top right
+		 bottom_right_dest, # bottom right
+		 bottom_left_dest,  # bottom left
+		 top_left_dest  	# top left
+	])
 
 	# Compute the perspective transform
 	M = cv2.getPerspectiveTransform(src, dst)
 
 	# Create waped image
 	#warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_NEAREST)  # keep same size as input image
-	warped = cv2.warpPerspective(image, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
-
-	return warped
-	'''
+	warped = cv2.warpPerspective(region_of_interest, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
+	plot_image(warped, True)
+	#return warped
+	
 
 def extract_region_of_interest(image, vertices):
 	"""

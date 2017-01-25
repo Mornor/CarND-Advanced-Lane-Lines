@@ -37,7 +37,7 @@ def test_get_composed_tresholded_image():
 	utils.plot_diff_images(original_image, thresholded_image, True)
 
 def test_warp():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'test6.jpg')
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'test5.jpg')
 	original_image = utils.combine_gradient_color(original_image)
 	#original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 	perspective_transformed_image = utils.warp(original_image)

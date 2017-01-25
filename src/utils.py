@@ -44,12 +44,21 @@ def warp(image):
 	# Get the image size
 	image_size = (image.shape[1], image.shape[0])
 
-	plt.imshow(image)
-	plt.plot(710, 460, '.')  # top right
-	plt.plot(1105, 705, '.') # bottom right
-	plt.plot(190, 705, '.')  # bottom left
-	plt.plot(570, 460, '.')  # top left
-	plt.show()
+	#plt.imshow(image)
+	#plt.plot(710, 460, '.')  # top right
+	#plt.plot(1105, 705, '.') # bottom right
+	#plt.plot(190, 705, '.')  # bottom left
+	#plt.plot(570, 460, '.')  # top left
+	#plt.show()
+
+	top_right = [740, 460]
+	top_left = [570, 460]
+	bottom_right = [1150, 705]
+	bottom_left = [155, 705]
+
+	vertices = np.array([[bottom_left, top_left, top_right, bottom_right]], dtype=np.int32)
+	region_of_interest = extract_region_of_interest(image, vertices)
+	plot_image(region_of_interest, True)
 
 	# src coordinates
 	'''
@@ -75,6 +84,31 @@ def warp(image):
 
 	return warped
 	'''
+
+def extract_region_of_interest(image, vertices):
+	"""
+	Applies an image mask.
+
+	Only keeps the region of the image defined by the polygon
+	formed from `vertices`. The rest of the image is set to black.
+	"""
+	# Defining a blank mask to start with
+	mask = np.zeros_like(image)
+
+	# Defining a 3 channel or 1 channel color to fill the mask with depending on the input image
+	if len(image.shape) > 2:
+		channel_count = image.shape[2]  # i.e. 3 or 4 depending on your image
+		ignore_mask_color = (255,) * channel_count
+	else:
+		ignore_mask_color = 255
+
+	# Filling pixels inside the polygon defined by "vertices" with the fill color
+	cv2.fillPoly(mask, vertices, ignore_mask_color)
+
+	# Feturning the image only where mask pixels are nonzero
+	masked_image = cv2.bitwise_and(image, mask)
+	
+	return masked_image
 
 
 def get_composed_tresholded_image(image):
@@ -212,8 +246,11 @@ def load_images(dir_path):
 	'''
 	return np.array([cv2.imread(dir_path + image) for image in os.listdir(dir_path)])
 
-def plot_image(image): 
-	plt.imshow(image)
+def plot_image(image, gray): 
+	if(gray):
+		plt.imshow(image, cmap='gray')
+	else: 
+		plt.imshow(image)
 	plt.show()
 
 def plot_diff_images(original_image, undistorted_image, gray):

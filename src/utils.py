@@ -44,13 +44,6 @@ def warp(image):
 	# Get the image size
 	image_size = (image.shape[1], image.shape[0])
 
-	#plt.imshow(image)
-	#plt.plot(710, 460, '.')  # top right
-	#plt.plot(1105, 705, '.') # bottom right
-	#plt.plot(190, 705, '.')  # bottom left
-	#plt.plot(570, 460, '.')  # top left
-	#plt.show()
-
 	top_right_src = [715, 460]
 	top_left_src = [570, 460]
 	bottom_right_src = [1200, 705]
@@ -58,36 +51,34 @@ def warp(image):
 
 	vertices = np.array([[bottom_left_src, top_left_src, top_right_src, bottom_right_src]], dtype=np.int32)
 	region_of_interest = extract_region_of_interest(image, vertices)
-	plot_image(region_of_interest, True)
 
 	# src coordinates
 	src = np.float32([
-		 top_right_src,   	# top right
-		 bottom_right_src,  # bottom right
-		 bottom_left_src,   # bottom left
-		 top_left_src		# top left
+		 top_right_src,   
+		 bottom_right_src, 
+		 bottom_left_src,  
+		 top_left_src	
 	])  	
+
 
 	top_right_dest = [870, 100]
 	top_left_dest = [155, 100]
 	bottom_right_dest = [870, 705]
 	bottom_left_dest = [155, 705]
 
-	# dest coordinates
+	# dst coordinates
 	dst = np.float32([
-		 top_right_dest,   	# top right
-		 bottom_right_dest, # bottom right
-		 bottom_left_dest,  # bottom left
-		 top_left_dest  	# top left
+		 top_right_dest,   	
+		 bottom_right_dest, 
+		 bottom_left_dest,  
+		 top_left_dest  	
 	])
 
 	# Compute the perspective transform
 	M = cv2.getPerspectiveTransform(src, dst)
 
 	# Create waped image
-	#warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_NEAREST)  # keep same size as input image
 	warped = cv2.warpPerspective(region_of_interest, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
-	#plot_image(warped, True)
 	return warped
 	
 
@@ -268,6 +259,6 @@ def plot_diff_images(original_image, undistorted_image, gray):
 		ax2.imshow(undistorted_image, cmap='gray')
 	else: 
 		ax2.imshow(undistorted_image)
-	ax2.set_title('Warped image', fontsize=25)
+	ax2.set_title('Region of interest - warped and with filter', fontsize=25)
 	plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 	plt.show()

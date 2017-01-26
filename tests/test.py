@@ -36,10 +36,12 @@ def test_get_composed_tresholded_image():
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 	utils.plot_diff_images(original_image, thresholded_image, True)
 
-def test_perspective_transform():
+def test_warp():
 	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
+	original_image_lines = utils.combine_gradient_color(original_image)
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-	perspective_transformed_image = utils.warp(original_image)
+	warped_image = utils.warp(original_image_lines)
+	utils.plot_diff_images(original_image, warped_image, True)
 
 def test_hls():
 	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
@@ -59,5 +61,5 @@ def test_combine_gradient_color():
 # test_dir_threshold()
 # test_get_composed_tresholded_image()
 # test_hls()
-test_combine_gradient_color()
-# test_perspective_transform()
+# test_combine_gradient_color()
+# test_warp()

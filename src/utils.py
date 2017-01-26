@@ -44,28 +44,68 @@ def warp(image):
 	# Get the image size
 	image_size = (image.shape[1], image.shape[0])
 
-	# src coordinates
-	src = np.float32(
-		[[850, 320],   # top right
-		 [865, 450],   # bottom right
-		 [533, 350],   # bottom left
-		 [535, 210]])  # top left
+	top_right_src = [715, 460]
+	top_left_src = [570, 460]
+	bottom_right_src = [1200, 705]
+	bottom_left_src = [155, 705]
 
-	# dest coordinates
-	dest = np.float32(
-		[[870, 240],   # top right
-		 [870, 370],   # bottom right
-		 [520, 370],   # bottom left
-		 [520, 240]])  # top left
+	vertices = np.array([[bottom_left_src, top_left_src, top_right_src, bottom_right_src]], dtype=np.int32)
+	region_of_interest = extract_region_of_interest(image, vertices)
+
+	# src coordinates
+	src = np.float32([
+		 top_right_src,   
+		 bottom_right_src, 
+		 bottom_left_src,  
+		 top_left_src	
+	])  	
+
+
+	top_right_dest = [870, 100]
+	top_left_dest = [155, 100]
+	bottom_right_dest = [870, 705]
+	bottom_left_dest = [155, 705]
+
+	# dst coordinates
+	dst = np.float32([
+		 top_right_dest,   	
+		 bottom_right_dest, 
+		 bottom_left_dest,  
+		 top_left_dest  	
+	])
 
 	# Compute the perspective transform
 	M = cv2.getPerspectiveTransform(src, dst)
 
 	# Create waped image
-	#warped = cv2.warpPerspective(img, M, img_size, flags=cv2.INTER_NEAREST)  # keep same size as input image
-	warped = cv2.warpPerspective(image, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
-
+	warped = cv2.warpPerspective(region_of_interest, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
 	return warped
+	
+
+def extract_region_of_interest(image, vertices):
+	"""
+	Applies an image mask.
+
+	Only keeps the region of the image defined by the polygon
+	formed from `vertices`. The rest of the image is set to black.
+	"""
+	# Defining a blank mask to start with
+	mask = np.zeros_like(image)
+
+	# Defining a 3 channel or 1 channel color to fill the mask with depending on the input image
+	if len(image.shape) > 2:
+		channel_count = image.shape[2]  # i.e. 3 or 4 depending on your image
+		ignore_mask_color = (255,) * channel_count
+	else:
+		ignore_mask_color = 255
+
+	# Filling pixels inside the polygon defined by "vertices" with the fill color
+	cv2.fillPoly(mask, vertices, ignore_mask_color)
+
+	# Feturning the image only where mask pixels are nonzero
+	masked_image = cv2.bitwise_and(image, mask)
+	
+	return masked_image
 
 
 def get_composed_tresholded_image(image):
@@ -203,9 +243,11 @@ def load_images(dir_path):
 	'''
 	return np.array([cv2.imread(dir_path + image) for image in os.listdir(dir_path)])
 
-def plot_image(image): 
-	plt.imshow(image)
-	plt.plot(570, 320, '.')
+def plot_image(image, gray): 
+	if(gray):
+		plt.imshow(image, cmap='gray')
+	else: 
+		plt.imshow(image)
 	plt.show()
 
 def plot_diff_images(original_image, undistorted_image, gray):
@@ -217,6 +259,6 @@ def plot_diff_images(original_image, undistorted_image, gray):
 		ax2.imshow(undistorted_image, cmap='gray')
 	else: 
 		ax2.imshow(undistorted_image)
-	ax2.set_title('Image with combined thresholds\n + Accentuate S space in HLS', fontsize=25)
+	ax2.set_title('Region of interest - warped and with filter', fontsize=25)
 	plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 	plt.show()

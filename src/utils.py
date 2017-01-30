@@ -12,6 +12,60 @@ import numpy as np
 # Define constants
 PATH_CAMERA_CAL = './camera_cal/'
 
+def plot_peaks_histogram(image):
+	slice_image(image)
+	#histogram = np.sum(image[image.shape[0]/2:,:], axis=0)
+	#print(histogram.shape)
+	#plot_diff_images(image, histogram, True)
+	#plt.plot(histogram) 
+	#plt.show()
+	#print(histogram)
+
+def slice_image(image, slices=10):
+	'''
+	Return an array of horizontal slices of the image 
+	'''
+	plot_image(image, True)
+	original_height = image.shape[0]
+	slices_array = []
+
+		
+	slices_array.append(image[image.shape[0] - (original_height / float(slices)):])
+	plot_image(slices_array[0], True)
+
+	image = image[original_height - (original_height - slices_array[0].shape[0]):] 
+	plot_image(image, True)
+
+	slices_array.append(image[image.shape[0] - (original_height / float(slices)):])
+	plot_image(slices_array[1], True)	
+
+	image = image[original_height - (original_height - slices_array[0].shape[0]):]
+	plot_image(image, True)
+
+	slices_array.append(image[image.shape[0] - (original_height / float(slices)):])
+	plot_image(slices_array[2], True)
+
+	image = image[original_height - (original_height - slices_array[0].shape[0]):]
+	plot_image(image, True)
+
+	slices_array.append(image[image.shape[0] - (original_height / float(slices)):])
+
+	
+
+#	for i in range(0, slices): 
+#		slices_array.append(image[image.shape[0] - (original_height / float(slices)):]) # First iteration: take the bottom first slice
+#		image = image[image.shape[0] - (image.shape[0] - slices_array[i].shape[0]):] # From the original image, remove this slice. 
+	
+	# Convert list to np array (10, 72, 1280)
+#	slices_array = np.asarray(slices_array)
+	#print(slices_array[1].shape)
+	#plot_image(slices_array[1], True)
+
+	#plot_image(image, True)
+	#plot_diff_images(image, slice, True)
+
+
+
 def combine_gradient_color(image):
 	'''
 	Combine gradient thresholds and color space to get the best result.
@@ -33,8 +87,8 @@ def combine_gradient_color(image):
 
 
 # Define a function that thresholds the S-channel of HLS
-def hls_select(img, thresh=(0, 255)):
-    hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
+def hls_select(image, thresh=(0, 255)):
+    hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
     s_channel = hls[:,:,2]
     binary_output = np.zeros_like(s_channel)
     binary_output[(s_channel > thresh[0]) & (s_channel <= thresh[1])] = 1

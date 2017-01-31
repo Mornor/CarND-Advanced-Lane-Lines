@@ -13,24 +13,55 @@ import numpy as np
 PATH_CAMERA_CAL = './camera_cal/'
 
 def plot_peaks_histogram(image):
-	slice_image(image)
-	#histogram = np.sum(image[image.shape[0]/2:,:], axis=0)
-	#print(histogram.shape)
-	#plot_diff_images(image, histogram, True)
-	#plt.plot(histogram) 
-	#plt.show()
-	#print(histogram)
+
+	slices = slice_image(image)
+
+	# Contains coordinates of the lines
+	coordinates_left_line_x = []
+	coordinates_left_line_y = []
+	coordinates_right_line_x = []
+	coordinates_right_line_y = []
+
+	for slice in slices:
+		# Get the histogram per slice (sum the pixel value, coulumn wise)
+		histogram = np.sum(slice, axis=0)
+
+		middle_point = np.int(histogram.shape[0]/2)
+
+		# For the x-coordinates, append the max index found in the histogram 
+		coordinates_left_line_x.append(np.argmax(histogram[:middle_point]))
+		coordinates_right_line_x.append(np.argmax(histogram[middle_point:]) + middle_point)
+
+		# For the y coordinates, append the center of the current slice
+		y_center = np.int(slice.shape[0]/2)
+		coordinates_left_line_y.append(y_center)
+		coordinates_right_line_y.append(y_center)
+
+	# Fit a second order polynomial
+	left_fit = np.polyfit(coordinates_left_line_y, coordinates_left_line_x, 2)
+	right_fit = np.polyfit(coordinates_right_line_y, coordinates_right_line_x, 2)
+	
+	# Generate x and y values for plotting
+	fity = np.linspace(0, image.shape[0]-1, image.shape[0] )
+	fit_leftx = left_fit[0]*fity**2 + left_fit[1]*fity + left_fit[2]
+	fit_rightx = right_fit[0]*fity**2 + right_fit[1]*fity + right_fit[2]
+	
+	plt.plot(fit_leftx, fity, color='blue')
+	plt.plot(fit_rightx, fity, color='blue')
+	plt.xlim(0, 1280)
+	plt.ylim(720, 0)
+
+	plt.show()
 
 def slice_image(image, slices=10):
 	'''
 	Return an array of horizontal slices of the image 
 	'''
-
 	original_height = image.shape[0]
 	slices_array = []
 	
 	for i in range(0, slices): 
-		slices_array.append(image[image.shape[0] - (original_height / float(slices)):]) # First iteration: take the bottom first slice
+		slices_array.append(image[image.shape[0] - (original_height / float(slices)):]) # Take the bottom slide
 		image = image = image[:-slices_array[i].shape[0]] # From the original image, remove this slice. 
 	
 	# Convert list to np array (10, 72, 1280)

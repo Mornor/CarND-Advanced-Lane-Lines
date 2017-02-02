@@ -55,6 +55,13 @@ def test_combine_gradient_color():
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 	utils.plot_diff_images(original_image, hls_image, True)
 
+def test_plot_peaks_histogram():
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
+	original_image_lines = utils.combine_gradient_color(original_image)
+	warped_image = utils.warp(original_image_lines)
+	utils.plot_peaks_histogram(warped_image)
+
+
 # test_undistort()
 # test_abs_sobel_thresh()
 # test_mag_thresh()
@@ -63,3 +70,4 @@ def test_combine_gradient_color():
 # test_hls()
 # test_combine_gradient_color()
 # test_warp()
+test_plot_peaks_histogram()

@@ -55,11 +55,20 @@ def test_combine_gradient_color():
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 	utils.plot_diff_images(original_image, hls_image, True)
 
-def test_plot_peaks_histogram():
+def test_get_polynomials_curve():
 	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
 	original_image_lines = utils.combine_gradient_color(original_image)
 	warped_image = utils.warp(original_image_lines)
-	utils.plot_peaks_histogram(warped_image)
+	utils.get_polynomials_curve(warped_image)
+
+def test_line_curvature():
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
+	original_image_lines = utils.combine_gradient_color(original_image)
+	warped_image = utils.warp(original_image_lines)
+	result_from_curvature = utils.get_polynomials_curve(warped_image)
+	left_fit = result_from_curvature['left_fit']
+	right_fit = result_from_curvature['right_fit']
+	utils.get_line_curvature(warped_image, left_fit, right_fit)
 
 
 # test_undistort()
@@ -70,4 +79,5 @@ def test_plot_peaks_histogram():
 # test_hls()
 # test_combine_gradient_color()
 # test_warp()
-test_plot_peaks_histogram()
+# test_get_polynomials_curve()
+test_line_curvature()

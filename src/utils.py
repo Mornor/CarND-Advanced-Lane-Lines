@@ -12,7 +12,45 @@ import numpy as np
 # Define constants
 PATH_CAMERA_CAL = './camera_cal/'
 
-def plot_peaks_histogram(image):
+def get_line_curvature(image, left_fit, right_fit):
+
+	out_img = np.dstack((image, image, image))*255
+
+	ploty = np.linspace(0, image.shape[0]-1, image.shape[0] )
+	left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
+	right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
+
+	y_eval = np.max(ploty)
+	left_curverad = ((1 + (2*left_fit[0]*y_eval + left_fit[1])**2)**1.5) / np.absolute(2*left_fit[0])
+	right_curverad = ((1 + (2*right_fit[0]*y_eval + right_fit[1])**2)**1.5) / np.absolute(2*right_fit[0])
+
+	'''
+	mark_size = 3
+	plt.xlim(0, 1280)
+	plt.ylim(0, 720)
+	plt.plot(left_fitx, ploty, color='green', linewidth=3)
+	plt.plot(right_fitx, ploty, color='green', linewidth=3)
+	plt.gca().invert_yaxis() # to visualize as we do the images
+	plt.show()
+	'''	
+
+	# Define conversions in x and y from pixels space to meters
+	ym_per_pix = 30/720 # meters per pixel in y dimension
+	xm_per_pix = 3.7/700 # meters per pixel in x dimension
+
+	# Fit new polynomials to x,y in world space
+	left_fit_cr = np.polyfit(ploty*ym_per_pix, left_fitx*xm_per_pix, 2)
+	right_fit_cr = np.polyfit(ploty*ym_per_pix, right_fitx*xm_per_pix, 2)
+	
+	# Calculate the new radius of curvature
+	left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
+	right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
+	
+	# Now our radius of curvature is in meters
+	print(left_curverad, 'm', right_curverad, 'm')
+	return {"left_curverad": left_curverad, "right_curverad": right_curverad}
+
+def get_polynomials_curve(image):
 
 	histogram = np.sum(image[image.shape[0]/2:,:], axis=0)
 	out_img = np.dstack((image, image, image))*255
@@ -81,7 +119,7 @@ def plot_peaks_histogram(image):
 	left_fit = np.polyfit(lefty, leftx, 2)
 	right_fit = np.polyfit(righty, rightx, 2)
 
-	return left_fit, right_fit
+	return {"left_fit": left_fit, "right_fit": right_fit}
 
 	'''
 	# Generate x and y values for plotting

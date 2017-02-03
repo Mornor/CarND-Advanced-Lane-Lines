@@ -71,15 +71,28 @@ def test_line_curvature():
 	utils.get_line_curvature(warped_image, left_fit, right_fit)
 
 def test_draw_lines():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'test1.jpg')
-	original_image_lines = utils.combine_gradient_color(original_image)
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
+	img_points, obj_points, nx, ny = utils.get_imgpoints_objpoints()
+	undistorted_image = utils.undistort_image(original_image, obj_points, img_points, nx, ny)
+
+	original_image_lines = utils.combine_gradient_color(undistorted_image)
 	warped_image , Minv = utils.warp(original_image_lines)
 	left_fit, right_fit = utils.get_polynomials_curve(warped_image)
-	utils.draw_lines(cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB), warped_image, left_fit, right_fit, Minv)
+	utils.draw_lines(cv2.cvtColor(undistorted_image, cv2.COLOR_BGR2RGB), warped_image, left_fit, right_fit, Minv)
+
+def test_pipeline():
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
+	img_points, obj_points, nx, ny = utils.get_imgpoints_objpoints()
+	undistorted_image = utils.undistort_image(original_image, obj_points, img_points, nx, ny)
+	filtered_image = utils.combine_gradient_color(undistorted_image)
+	warped_image, Minv = utils.warp(filtered_image)
+	left_fit, right_fit = utils.get_polynomials_curve(warped_image)
+	left_curvrad, right_curvrad = utils.get_line_curvature(warped_image, left_fit, right_fit)
+	result = utils.draw_lines(cv2.cvtColor(undistorted_image, cv2.COLOR_BGR2RGB), warped_image, left_fit, right_fit, Minv)
 
 
 
-test_undistort()
+# test_undistort()
 # test_abs_sobel_thresh()
 # test_mag_thresh()
 # test_dir_threshold()
@@ -89,4 +102,5 @@ test_undistort()
 # test_warp()
 # test_get_polynomials_curve()
 # test_line_curvature()
-#test_draw_lines()
+# test_draw_lines()
+test_pipeline()

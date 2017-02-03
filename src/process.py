@@ -13,7 +13,7 @@ PATH_CAMERA_CAL = './camera_cal/'
 # Calibrate the cameras based on ./camera_cal images
 img_points, obj_points, nx, ny = utils.get_imgpoints_objpoints()
 
-def process_image(image): 
+def process_image(image):
 
 	# Undistort image 
 	undistorted_image = utils.undistort_image(image, obj_points, img_points, nx, ny)
@@ -31,7 +31,7 @@ def process_image(image):
 	left_curvrad, right_curvrad = utils.get_line_curvature(warped_image, left_fit, right_fit)
 
 	# Draw back the lines on the input image
-	result = utils.draw_lines(cv2.cvtColor(undistorted_image, cv2.COLOR_BGR2RGB), warped_image, left_fit, right_fit, Minv)
+	result = utils.draw_lines(undistorted_image, warped_image, left_fit, right_fit, Minv)
 
 	# Retunn the result
 	return result

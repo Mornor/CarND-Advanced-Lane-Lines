@@ -34,8 +34,7 @@ def process_image(image):
 	result = utils.draw_lines(undistorted_image, warped_image, left_fit, right_fit, Minv)
 
 	# Print the computed curvature on the input image
-	result = 
-
+	result = utils.draw_measured_curvature(result, left_curvrad, right_curvrad)
 
 	# Return the result
 	return result

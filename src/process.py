@@ -33,7 +33,7 @@ def process_image(image):
 	# Draw back the lines on the input image
 	result = utils.draw_lines(undistorted_image, warped_image, left_fit, right_fit, Minv)
 
-	# Retunn the result
+	# Return the result
 	return result
 
 

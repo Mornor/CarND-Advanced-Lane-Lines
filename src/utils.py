@@ -12,6 +12,32 @@ import numpy as np
 # Define constants
 PATH_CAMERA_CAL = './camera_cal/'
 
+def draw_lines(original_image, warped_image, left_fit, right_fit, Minv):
+
+	ploty = np.linspace(0, warped_image.shape[0]-1, warped_image.shape[0])
+	left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
+	right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
+
+	# Create an image to draw the lines on
+	warp_zero = np.zeros_like(warped_image).astype(np.uint8)
+	color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
+
+	# Recast the x and y points into usable format for cv2.fillPoly()
+	pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
+	pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
+	pts = np.hstack((pts_left, pts_right))
+
+	cv2.fillPoly(color_warp, np.int_([pts]), (0,255, 0))
+	
+	# Warp the blank back to original image space using inverse perspective matrix (Minv)
+	newwarp = cv2.warpPerspective(color_warp, Minv, (warped_image.shape[1], warped_image.shape[0])) 
+	
+	# Combine the result with the original image
+	result = cv2.addWeighted(original_image, 1, newwarp, 0.3, 0)
+	#plt.imshow(result)
+	#plt.show()
+	return result
+
 def get_line_curvature(image, left_fit, right_fit):
 
 	out_img = np.dstack((image, image, image))*255
@@ -32,7 +58,7 @@ def get_line_curvature(image, left_fit, right_fit):
 	plt.plot(right_fitx, ploty, color='green', linewidth=3)
 	plt.gca().invert_yaxis() # to visualize as we do the images
 	plt.show()
-	'''	
+	'''
 
 	# Define conversions in x and y from pixels space to meters
 	ym_per_pix = 30/720 # meters per pixel in y dimension
@@ -47,8 +73,8 @@ def get_line_curvature(image, left_fit, right_fit):
 	right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
 	
 	# Now our radius of curvature is in meters
-	print(left_curverad, 'm', right_curverad, 'm')
-	return {"left_curverad": left_curverad, "right_curverad": right_curverad}
+	# print(left_curverad, 'm', right_curverad, 'm')
+	return left_curverad, right_curverad
 
 def get_polynomials_curve(image):
 
@@ -119,14 +145,12 @@ def get_polynomials_curve(image):
 	left_fit = np.polyfit(lefty, leftx, 2)
 	right_fit = np.polyfit(righty, rightx, 2)
 
-	return {"left_fit": left_fit, "right_fit": right_fit}
-
-	'''
-	# Generate x and y values for plotting
 	ploty = np.linspace(0, image.shape[0]-1, image.shape[0] )
 	left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
 	right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
 
+	'''
+	# Plot the out_img
 	out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
 	out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
 	plt.imshow(out_img)
@@ -136,6 +160,8 @@ def get_polynomials_curve(image):
 	plt.ylim(720, 0)
 	plt.show()
 	'''
+
+	return left_fit, right_fit
 
 def slice_image(image, slices=10):
 	'''
@@ -156,7 +182,6 @@ def combine_gradient_color(image):
 	'''
 	Combine gradient thresholds and color space to get the best result.
 	All the techniques are combined to better detect the lines
- 	[TODO] : Give an undistorded image (BGR) as param
 	'''
 	rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -184,8 +209,8 @@ def warp(image):
 	# Get the image size
 	image_size = (image.shape[1], image.shape[0])
 
-	top_right_src = [715, 460]
-	top_left_src = [570, 460]
+	top_right_src = [735, 450]
+	top_left_src = [560, 450]
 	bottom_right_src = [1200, 705]
 	bottom_left_src = [155, 705]
 
@@ -201,9 +226,9 @@ def warp(image):
 	])  	
 
 
-	top_right_dest = [870, 100]
+	top_right_dest = [860, 100]
 	top_left_dest = [155, 100]
-	bottom_right_dest = [870, 705]
+	bottom_right_dest = [860, 705]
 	bottom_left_dest = [155, 705]
 
 	# dst coordinates
@@ -217,9 +242,13 @@ def warp(image):
 	# Compute the perspective transform
 	M = cv2.getPerspectiveTransform(src, dst)
 
+	# Compute the inverse matrix (will be used in the last steps)
+	Minv = cv2.getPerspectiveTransform(dst, src)
+
 	# Create waped image
 	warped = cv2.warpPerspective(region_of_interest, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
-	return warped
+
+	return warped, Minv
 	
 
 def extract_region_of_interest(image, vertices):
@@ -333,11 +362,14 @@ def dir_thresh(image, sobel_kernel=3, thresh=(0, np.pi/2)):
 	# Return the binary image
 	return binary_output
 
-def get_imgpoints_objpoints(calibration_images): 
+def get_imgpoints_objpoints(): 
 	'''
 	Compute the camera calibration matrix and distortion coefficients.
 	@return imgpoint and objpoints
 	'''
+
+	calibration_images = load_images(PATH_CAMERA_CAL)
+
 	nx = 9 # nb corner along x axis
 	ny = 6 # nb corner along y axis
 
@@ -369,11 +401,12 @@ def undistort_image(img, objpoints, imgpoints, nx, ny):
 	Performs the camera calibration and image distortion correction
 	@return the undistorted image
 	'''
-	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+	gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	ret, corners = cv2.findChessboardCorners(gray, (nx, ny), None)
 	# img = cv2.drawChessboardCorners(img, (nx, ny), corners, ret)
 	ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
 	dst = cv2.undistort(img, mtx, dist, None, mtx)
+
 	return dst
 
 def load_images(dir_path):

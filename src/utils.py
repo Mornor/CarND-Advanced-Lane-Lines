@@ -34,8 +34,8 @@ def draw_lines(original_image, warped_image, left_fit, right_fit, Minv):
 	
 	# Combine the result with the original image
 	result = cv2.addWeighted(original_image, 1, newwarp, 0.3, 0)
-	plt.imshow(result)
-	plt.show()
+	#plt.imshow(result)
+	#plt.show()
 	return result
 
 def get_line_curvature(image, left_fit, right_fit):

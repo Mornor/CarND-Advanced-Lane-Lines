@@ -182,7 +182,6 @@ def combine_gradient_color(image):
 	'''
 	Combine gradient thresholds and color space to get the best result.
 	All the techniques are combined to better detect the lines
- 	[TODO] : Give an undistorded image (BGR) as param
 	'''
 	rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -210,8 +209,8 @@ def warp(image):
 	# Get the image size
 	image_size = (image.shape[1], image.shape[0])
 
-	top_right_src = [715, 460]
-	top_left_src = [570, 460]
+	top_right_src = [735, 450]
+	top_left_src = [560, 450]
 	bottom_right_src = [1200, 705]
 	bottom_left_src = [155, 705]
 
@@ -227,9 +226,9 @@ def warp(image):
 	])  	
 
 
-	top_right_dest = [870, 100]
+	top_right_dest = [860, 100]
 	top_left_dest = [155, 100]
-	bottom_right_dest = [870, 705]
+	bottom_right_dest = [860, 705]
 	bottom_left_dest = [155, 705]
 
 	# dst coordinates
@@ -248,6 +247,7 @@ def warp(image):
 
 	# Create waped image
 	warped = cv2.warpPerspective(region_of_interest, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
+
 	return warped, Minv
 	
 

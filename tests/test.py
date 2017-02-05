@@ -42,7 +42,7 @@ def test_warp():
 	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
 	original_image_lines = utils.combine_gradient_color(original_image)
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-	warped_image, Minv = utils.warp(original_image_lines)
+	warped_image, Minv = utils.warp(original_image)
 	utils.plot_diff_images(original_image, warped_image, True)
 
 def test_hls():
@@ -99,8 +99,8 @@ def test_pipeline():
 # test_get_composed_tresholded_image()
 # test_hls()
 # test_combine_gradient_color()
-# test_warp()
+test_warp()
 # test_get_polynomials_curve()
 # test_line_curvature()
 # test_draw_lines()
-test_pipeline()
+# test_pipeline()

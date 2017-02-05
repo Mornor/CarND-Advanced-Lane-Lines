@@ -90,6 +90,19 @@ def test_pipeline():
 	left_curvrad, right_curvrad = utils.get_line_curvature(warped_image, left_fit, right_fit)
 	result = utils.draw_lines(cv2.cvtColor(undistorted_image, cv2.COLOR_BGR2RGB), warped_image, left_fit, right_fit, Minv)
 
+def test_print_data(): 
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
+	#img_points, obj_points, nx, ny = utils.get_imgpoints_objpoints()
+	#undistorted_image = utils.undistort_image(original_image, obj_points, img_points, nx, ny)
+	filtered_image = utils.combine_gradient_color(original_image)
+	warped_image, Minv = utils.warp(filtered_image)
+	left_fit, right_fit = utils.get_polynomials_curve(warped_image)
+	left_curvrad, right_curvrad = utils.get_line_curvature(warped_image, left_fit, right_fit)
+	result = utils.draw_lines(cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB), warped_image, left_fit, right_fit, Minv)
+	result = utils.draw_measured_curvature(result, left_curvrad, right_curvrad, "-0.45")
+	utils.plot_image(result, False)
+
+
 
 
 # test_undistort()
@@ -99,8 +112,9 @@ def test_pipeline():
 # test_get_composed_tresholded_image()
 # test_hls()
 # test_combine_gradient_color()
-test_warp()
+# test_warp()
 # test_get_polynomials_curve()
 # test_line_curvature()
 # test_draw_lines()
 # test_pipeline()
+test_print_data()

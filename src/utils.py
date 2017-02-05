@@ -276,6 +276,21 @@ def extract_region_of_interest(image, vertices):
 	
 	return masked_image
 
+def draw_measured_curvature(image, left_curverad, right_curverad, dst_from_center):
+
+	# Print left radius on the left side of the image
+	cv2.putText(image, 'Left radius', (50, 600), fontFace = 5, fontScale = 1.5, color=(255,255,255), thickness = 2)
+	cv2.putText(image, '{}m'.format(int(left_curverad)), (70, 650), fontFace = 5, fontScale = 1.5, color=(255,255,255), thickness = 2)
+
+	# Print left radius on the left side of the image
+	cv2.putText(image, 'Right radius', (1000, 600), fontFace = 5, fontScale = 1.5, color=(255,255,255), thickness = 2)
+	cv2.putText(image, '{}m'.format(int(left_curverad)), (1070, 650), fontFace = 5, fontScale = 1.5, color=(255,255,255), thickness = 2)
+
+	# Print distance from center
+	cv2.putText(image, 'Distance from center', (370, 100), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
+	cv2.putText(image, '{}m'.format(dst_from_center), (550, 160), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
+
+	return image
 
 def get_composed_tresholded_image(image):
 	ksize = 3 # Choose a larger odd number to smooth gradient measurements

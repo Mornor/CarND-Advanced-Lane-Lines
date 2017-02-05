@@ -30,8 +30,12 @@ def process_image(image):
 	# Measure the curvature of the two lines
 	left_curvrad, right_curvrad = utils.get_line_curvature(warped_image, left_fit, right_fit)
 
-	# Draw back the lines on the input image
+	# Draw the detected lines on the input image
 	result = utils.draw_lines(undistorted_image, warped_image, left_fit, right_fit, Minv)
+
+	# Print the computed curvature on the input image
+	result = 
+
 
 	# Return the result
 	return result

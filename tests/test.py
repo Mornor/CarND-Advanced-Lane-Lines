@@ -58,7 +58,7 @@ def test_combine_gradient_color():
 	utils.plot_diff_images(original_image, hls_image, True)
 
 def test_get_polynomials_curve():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
 	original_image_lines = utils.combine_gradient_color(original_image)
 	warped_image, Minv = utils.warp(original_image_lines)
 	utils.get_polynomials_curve(warped_image)
@@ -113,8 +113,8 @@ def test_print_data():
 # test_hls()
 # test_combine_gradient_color()
 # test_warp()
-# test_get_polynomials_curve()
+test_get_polynomials_curve()
 # test_line_curvature()
 # test_draw_lines()
 # test_pipeline()
-test_print_data()
+# test_print_data()

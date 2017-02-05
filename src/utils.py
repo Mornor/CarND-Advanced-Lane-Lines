@@ -78,6 +78,9 @@ def get_line_curvature(image, left_fit, right_fit):
 
 def get_polynomials_curve(image):
 
+	# Metters per pixel
+	xm_per_pix = 3.7/700 
+
 	histogram = np.sum(image[image.shape[0]/2:,:], axis=0)
 	out_img = np.dstack((image, image, image))*255
 
@@ -113,15 +116,15 @@ def get_polynomials_curve(image):
 		win_xright_low = rightx_current - margin
 		win_xright_high = rightx_current + margin
 
-		 # Draw the windows on the visualization image
-		cv2.rectangle(out_img,(win_xleft_low,win_y_low),(win_xleft_high,win_y_high),(0,255,0), 2) 
-		cv2.rectangle(out_img,(win_xright_low,win_y_low),(win_xright_high,win_y_high),(0,255,0), 2) 
+		# Draw the windows on the visualization image (only useful for testing)
+		# cv2.rectangle(out_img,(win_xleft_low,win_y_low),(win_xleft_high,win_y_high),(0,255,0), 2) 
+		# cv2.rectangle(out_img,(win_xright_low,win_y_low),(win_xright_high,win_y_high),(0,255,0), 2) 
 
-		 # Identify the nonzero pixels in x and y within the window
+		# Identify the nonzero pixels in x and y within the window
 		good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) & (nonzerox >= win_xleft_low) & (nonzerox < win_xleft_high)).nonzero()[0]
 		good_right_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) & (nonzerox >= win_xright_low) & (nonzerox < win_xright_high)).nonzero()[0]
 
-			 # Append these indices to the lists
+		# Append these indices to the lists
 		left_lane_inds.append(good_left_inds)
 		right_lane_inds.append(good_right_inds)
 
@@ -148,6 +151,15 @@ def get_polynomials_curve(image):
 	ploty = np.linspace(0, image.shape[0]-1, image.shape[0] )
 	left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
 	right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
+
+	# Compute the deviation of the camera from the center
+	#print(leftx.shape)
+	#print(leftx[1])
+	#print(midpoint)
+	car_middle_pixel = int((leftx[0] + rightx[0])/2)
+	screen_off_center = midpoint - car_middle_pixel
+	meters_off_center = xm_per_pix * rightx[0]
+	# print(meters_off_center)
 
 	'''
 	# Plot the out_img
@@ -276,7 +288,7 @@ def extract_region_of_interest(image, vertices):
 	
 	return masked_image
 
-def draw_measured_curvature(image, left_curverad, right_curverad, dst_from_center):
+def draw_measured_curvature(image, left_curverad, right_curverad):
 
 	# Print left radius on the left side of the image
 	cv2.putText(image, 'Left radius', (50, 600), fontFace = 5, fontScale = 1.5, color=(255,255,255), thickness = 2)
@@ -287,8 +299,8 @@ def draw_measured_curvature(image, left_curverad, right_curverad, dst_from_cente
 	cv2.putText(image, '{}m'.format(int(left_curverad)), (1070, 650), fontFace = 5, fontScale = 1.5, color=(255,255,255), thickness = 2)
 
 	# Print distance from center
-	cv2.putText(image, 'Distance from center', (370, 100), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
-	cv2.putText(image, '{}m'.format(dst_from_center), (550, 160), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
+	# cv2.putText(image, 'Distance from center', (370, 100), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
+	# cv2.putText(image, '{}m'.format(dst_from_center), (550, 160), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
 
 	return image
 

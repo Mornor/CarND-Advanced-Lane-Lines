@@ -28,7 +28,7 @@ For each image of the video, the following steps have been applied (in this orde
 
 * Apply a distortion correction to raw images.
 This allow to un-distort the original image. Applied to a chessboard image, the result can be seen below.
-![camera_calibration_without_lines](./output_images/camera_cal_withou_lines.png)
+![camera_calibration_without_lines](./output_images/camera_cal_without_lines.png)
 
 
 * Use color transforms, gradients, etc., to create a thresholded binary image.

@@ -27,14 +27,14 @@ def process_image(image):
 	# Get the polynomials fitting the curvature of the lines
 	left_fit, right_fit = utils.get_polynomials_curve(warped_image)
 
-	# Measure the curvature of the two lines
-	left_curvrad, right_curvrad = utils.get_line_curvature(warped_image, left_fit, right_fit)
+	# Measure the curvature of the two lines, and get the distance from the center
+	left_curvrad, right_curvrad, dst_from_center = utils.get_line_curvature(warped_image, left_fit, right_fit)
 
 	# Draw the detected lines on the input image
 	result = utils.draw_lines(undistorted_image, warped_image, left_fit, right_fit, Minv)
 
-	# Print the computed curvature on the input image
-	result = utils.draw_measured_curvature(result, left_curvrad, right_curvrad)
+	# Print the computed curvature on the input image, and the distance from the center
+	result = utils.draw_measured_curvature(result, left_curvrad, right_curvrad, dst_from_center)
 
 	# Return the result
 	return result

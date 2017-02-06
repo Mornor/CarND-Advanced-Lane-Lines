@@ -221,10 +221,11 @@ def warp(image):
 	# Get the image size
 	image_size = (image.shape[1], image.shape[0])
 
-	top_right_src = [740, 460]
+	top_right_src = [765, 460]
 	top_left_src = [575, 460]
-	bottom_right_src = [1200, 720]
+	bottom_right_src = [1180, 720]
 	bottom_left_src = [180, 720]
+	
 
 	vertices = np.array([[bottom_left_src, top_left_src, top_right_src, bottom_right_src]], dtype=np.int32)
 	region_of_interest = extract_region_of_interest(image, vertices)
@@ -315,7 +316,10 @@ def get_composed_tresholded_image(image):
 	dir_binary = dir_thresh(image, sobel_kernel=ksize, thresh=(0.7, 1.3))
 
 	combined = np.zeros_like(dir_binary)
-	combined[((gradx == 1) & (grady == 1)) | ((mag_binary == 1) & (dir_binary == 1))] = 1
+	combined[((gradx == 1) & (grady == 1)) & ((mag_binary == 1) & (dir_binary == 1))] = 1
+
+	#combined = np.zeros_like(mag_binary)
+	#combined[((gradx == 1) & (grady == 1)) & (mag_binary == 1)] = 1
 	
 	return combined
 	

@@ -73,7 +73,6 @@ def get_line_curvature(image, left_fit, right_fit):
 	right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
 	
 	# Now our radius of curvature is in meters
-	# print(left_curverad, 'm', right_curverad, 'm')
 	return left_curverad, right_curverad
 
 def get_polynomials_curve(image):
@@ -145,6 +144,7 @@ def get_polynomials_curve(image):
 	righty = nonzeroy[right_lane_inds] 
 
 	# Fit a second order polynomial to each
+
 	left_fit = np.polyfit(lefty, leftx, 2)
 	right_fit = np.polyfit(righty, rightx, 2)
 
@@ -221,10 +221,11 @@ def warp(image):
 	# Get the image size
 	image_size = (image.shape[1], image.shape[0])
 
-	top_right_src = [735, 450]
-	top_left_src = [560, 450]
-	bottom_right_src = [1200, 705]
-	bottom_left_src = [155, 705]
+	top_right_src = [765, 460]
+	top_left_src = [575, 460]
+	bottom_right_src = [1180, 720]
+	bottom_left_src = [180, 720]
+	
 
 	vertices = np.array([[bottom_left_src, top_left_src, top_right_src, bottom_right_src]], dtype=np.int32)
 	region_of_interest = extract_region_of_interest(image, vertices)
@@ -237,11 +238,10 @@ def warp(image):
 		 top_left_src	
 	])  	
 
-
-	top_right_dest = [860, 100]
-	top_left_dest = [155, 100]
-	bottom_right_dest = [860, 705]
-	bottom_left_dest = [155, 705]
+	top_right_dest = [960, 0]
+	top_left_dest = [320, 0]
+	bottom_right_dest = [960, 720]
+	bottom_left_dest = [320, 720]
 
 	# dst coordinates
 	dst = np.float32([
@@ -257,8 +257,10 @@ def warp(image):
 	# Compute the inverse matrix (will be used in the last steps)
 	Minv = cv2.getPerspectiveTransform(dst, src)
 
-	# Create waped image
+	#pythpn3  Create waped image
 	warped = cv2.warpPerspective(region_of_interest, M, image_size, flags=cv2.INTER_LINEAR)  # keep same size as input image
+
+	#plot_diff_images(region_of_interest, warped, False)
 
 	return warped, Minv
 	
@@ -314,7 +316,10 @@ def get_composed_tresholded_image(image):
 	dir_binary = dir_thresh(image, sobel_kernel=ksize, thresh=(0.7, 1.3))
 
 	combined = np.zeros_like(dir_binary)
-	combined[((gradx == 1) & (grady == 1)) | ((mag_binary == 1) & (dir_binary == 1))] = 1
+	combined[((gradx == 1) & (grady == 1)) & ((mag_binary == 1) & (dir_binary == 1))] = 1
+
+	#combined = np.zeros_like(mag_binary)
+	#combined[((gradx == 1) & (grady == 1)) & (mag_binary == 1)] = 1
 	
 	return combined
 	

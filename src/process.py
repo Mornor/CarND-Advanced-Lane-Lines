@@ -19,7 +19,8 @@ def process_image(image):
 	undistorted_image = utils.undistort_image(image, obj_points, img_points, nx, ny)
 
 	# Apply a combination of different filter thresholds and color space changes to the image to make line easy to detect
-	filtered_image = utils.combine_gradient_color(undistorted_image)
+	#filtered_image = utils.combine_gradient_color(undistorted_image)
+	filtered_image = utils.get_composed_tresholded_image(undistorted_image)
 
 	# Perspective transform, warp the image to better detect line curvature (Bird Eye view)
 	warped_image, Minv = utils.warp(filtered_image)

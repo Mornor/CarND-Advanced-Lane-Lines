@@ -1,8 +1,6 @@
-##Writeup Template
+###Advanced Lane Finding Project
 
-**Advanced Lane Finding Project**
-
-###Each points from the requirements rubric are here described
+** Each points from the requirements rubric are here described
 
 ---
 ###Writeup / README
@@ -87,8 +85,7 @@ I then convert it in meters.
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
-
+The function `draw_lines()` (line 15 of `./src/utils.py`) take care of drawing back the result on the original image.  Here is an example of my result on a test image:
 ![final_result](./output_images/radius_nornal.png) 
 
 ---
@@ -104,6 +101,6 @@ Here's a [the final result](./output.mp4)
 ###Discussion
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+I do think the different masks applied to the original image could be fine-tuned. Indeed, in some images, the lines are not so-well detected. Since it is only for one or 2 frames, it does not present a danger to the vehicle. <br>
+It was difficult to find an otpimal region of interest to do a perspective transform. So far, the source and destination points are hard-coded and make that dynamic would certainly improve the accuracy of the `warp()` function. However, I have not been able to do so.  
 

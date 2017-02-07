@@ -1,6 +1,6 @@
 ###Advanced Lane Finding Project
 
-** Each points from the requirements rubric are here described
+Each points from the requirements rubric are here described
 
 ---
 ###Writeup / README
@@ -16,7 +16,7 @@ I start by preparing "object points", which will be the (x, y, z) coordinates of
 
 I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
 
-![camera_calibration_with_lines](./output_images/camera_calibration_with_lines.png)
+![camera_calibration_with_lines](./output_images/camera_cal_with_lines.png)
 
 ###Pipeline (single images)
 
@@ -76,11 +76,17 @@ Which, applied on the whole image give the following result:
 
 I did this in `get_line_curvature()` method (line 41 of `./src/utils.py`). This function take an `image` as well as the left and right polynomials fitting the detected lines (`left_fit` and `right_fit` respectively). <br>
 The Radius of curvature is given by the following formula: 
+
 ![radius](./output_images/radius_normal.png)
+
 Then, I take the derivatives of the polynomials: 
+
 ![derivatives](./output_images/derivatives.png)
+
 Which gives: 
+
 ![adapted](./output_images/radius_adapted.png)
+
 I then convert it in meters. 
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.

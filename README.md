@@ -58,7 +58,7 @@ Each sliced is then divided verticaly - to isolate the right line from the left 
 I then add all the white pixels together, in order to find the X position where there is the highest density of pixel. This way, I can clearly identify the position of the lane, based on the density of the pixels from the binary image. Here the peaks indicate the X-position of the line. 
 ![histogram](./output_images/histogram.png)
 Which, applied on the whole image give the following result: 
-![histogram_applied](./output_images/histogram_applied.png) 
+![histogram_applied](./output_images/detect_lines_curvature.png) 
 
 
 * Determine the curvature of the lane and vehicle position with respect to center.

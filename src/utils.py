@@ -42,13 +42,11 @@ def get_line_curvature(image, left_fit, right_fit):
 
 	out_img = np.dstack((image, image, image))*255
 
-	ploty = np.linspace(0, image.shape[0]-1, image.shape[0] )
+	ploty = np.linspace(0, image.shape[0]-1, image.shape[0])
 	left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
 	right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
 
 	y_eval = np.max(ploty)
-	left_curverad = ((1 + (2*left_fit[0]*y_eval + left_fit[1])**2)**1.5) / np.absolute(2*left_fit[0])
-	right_curverad = ((1 + (2*right_fit[0]*y_eval + right_fit[1])**2)**1.5) / np.absolute(2*right_fit[0])
 
 	'''
 	mark_size = 3
@@ -64,16 +62,29 @@ def get_line_curvature(image, left_fit, right_fit):
 	ym_per_pix = 30/720 # meters per pixel in y dimension
 	xm_per_pix = 3.7/700 # meters per pixel in x dimension
 
-	# Fit new polynomials to x,y in world space
+	# Fit polynomials to x,y in world space
 	left_fit_cr = np.polyfit(ploty*ym_per_pix, left_fitx*xm_per_pix, 2)
 	right_fit_cr = np.polyfit(ploty*ym_per_pix, right_fitx*xm_per_pix, 2)
 	
 	# Calculate the new radius of curvature
 	left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
 	right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
+
+	# Compute the center offset
+	center_of_image_in_meters = (image.shape[1] / 2) * xm_per_pix
+	actual_centers_in_meters = np.mean([left_fitx, right_fitx]) * xm_per_pix
+	dst_from_center = center_of_image_in_meters - actual_centers_in_meters
+	
+	#print(leftx.shape)
+	#print(leftx[1])
+	#print(midpoint)
+	#car_middle_pixel = int((leftx[0] + rightx[0])/2)
+	#screen_off_center = midpoint - car_middle_pixel
+	#meters_off_center = xm_per_pix * rightx[0]
+	#print(dst_from_center)
 	
 	# Now our radius of curvature is in meters
-	return left_curverad, right_curverad
+	return left_curverad, right_curverad, dst_from_center
 
 def get_polynomials_curve(image):
 
@@ -144,22 +155,12 @@ def get_polynomials_curve(image):
 	righty = nonzeroy[right_lane_inds] 
 
 	# Fit a second order polynomial to each
-
 	left_fit = np.polyfit(lefty, leftx, 2)
 	right_fit = np.polyfit(righty, rightx, 2)
 
 	ploty = np.linspace(0, image.shape[0]-1, image.shape[0] )
 	left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
 	right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
-
-	# Compute the deviation of the camera from the center
-	#print(leftx.shape)
-	#print(leftx[1])
-	#print(midpoint)
-	car_middle_pixel = int((leftx[0] + rightx[0])/2)
-	screen_off_center = midpoint - car_middle_pixel
-	meters_off_center = xm_per_pix * rightx[0]
-	# print(meters_off_center)
 
 	'''
 	# Plot the out_img
@@ -290,7 +291,7 @@ def extract_region_of_interest(image, vertices):
 	
 	return masked_image
 
-def draw_measured_curvature(image, left_curverad, right_curverad):
+def draw_measured_curvature(image, left_curverad, right_curverad, dst_from_center):
 
 	# Print left radius on the left side of the image
 	cv2.putText(image, 'Left radius', (50, 600), fontFace = 5, fontScale = 1.5, color=(255,255,255), thickness = 2)
@@ -301,8 +302,8 @@ def draw_measured_curvature(image, left_curverad, right_curverad):
 	cv2.putText(image, '{}m'.format(int(left_curverad)), (1070, 650), fontFace = 5, fontScale = 1.5, color=(255,255,255), thickness = 2)
 
 	# Print distance from center
-	# cv2.putText(image, 'Distance from center', (370, 100), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
-	# cv2.putText(image, '{}m'.format(dst_from_center), (550, 160), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
+	cv2.putText(image, 'Offset from center', (370, 100), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
+	cv2.putText(image, '{0:.2f}m'.format(dst_from_center), (550, 160), fontFace = 5, fontScale = 2, color=(255,255,255), thickness = 2)
 
 	return image
 
@@ -464,6 +465,6 @@ def plot_diff_images(original_image, undistorted_image, gray):
 		ax2.imshow(undistorted_image, cmap='gray')
 	else: 
 		ax2.imshow(undistorted_image)
-	ax2.set_title('Region of interest - warped and with filter', fontsize=25)
+	ax2.set_title('Undistorded image', fontsize=25)
 	plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 	plt.show()

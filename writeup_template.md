@@ -92,7 +92,7 @@ I then convert it in meters.
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
 The function `draw_lines()` (line 15 of `./src/utils.py`) take care of drawing back the result on the original image.  Here is an example of my result on a test image:
-![final_result](./output_images/radius_nornal.png) 
+![final_result](./output_images/final_result.png) 
 
 ---
 

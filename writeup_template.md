@@ -25,7 +25,7 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 ####1. Provide an example of a distortion-corrected image.
 The `objpoints` and `imgpoints` calculated when calibrating the camera are then used to undistort each image, with the help of the 
 `undistort` function provided by OpenCV: 
-![alt text][image2]
+![unidstort](./output_images/undistort_test.png)
 
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 I have used a combination of differents masks and space color transformation to make the lines as visible as possible. <br>
@@ -41,7 +41,7 @@ Finally I transormed the image into HSV space and combine them with all the step
 
 ####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warp()`, which appears in lines 1 through 8 in the file `utils.py`.  The `warper()` function takes as inputs an image (`image`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `warp()`, which start at lines 221 in the file `./src/utils.py`.  The `warp()` function takes only an input image (`image`). The source (`src`) and destination (`dst`) points are harcoded as the following manner: 
 
 ```
 src = np.float32([
@@ -65,19 +65,31 @@ I verified that my perspective transform was working as expected by drawing the 
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
-
-![poly](./output_images/polynomials.png) 
+The `get_polynomials_curve()` in `./src/utils.py`, line 89 only take an image and do the following actions to find the polynomials fitting to the line curve. 
+The image is sliced in 10 different horizontal parts, with the same height. <br>
+![slice](./output_images/slice.png)
+Each sliced is then divided verticaly - to isolate the right line from the left one. 
+I then add all the white pixels together, in order to find the X position where there is the highest density of pixel. This way, I can clearly identify the position of the lane, based on the density of the pixels from the binary image. Here the peaks indicate the X-position of the line. 
+![histogram](./output_images/histogram.png)
+Which, applied on the whole image give the following result: 
+![histogram_applied](./output_images/detect_lines_curvature.png)
 
 ####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+I did this in `get_line_curvature()` method (line 41 of `./src/utils.py`). This function take an `image` as well as the left and right polynomials fitting the detected lines (`left_fit` and `right_fit` respectively). <br>
+The Radius of curvature is given by the following formula: 
+![radius](./output_images/radius_normal.png)
+Then, I take the derivatives of the polynomials: 
+![derivatives](./output_images/derivatives.png)
+Which gives: 
+![adapted](./output_images/radius_adapted.png)
+I then convert it in meters. 
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
 I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
 
-![final_result](./output_images/final_result.png) 
+![final_result](./output_images/radius_nornal.png) 
 
 ---
 

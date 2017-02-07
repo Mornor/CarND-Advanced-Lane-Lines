@@ -7,7 +7,7 @@ PATH_CAMERA_CAL = './camera_cal/'
 PATH_TEST_IMAGES = './test_images/'
 
 def test_undistort():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'test5.jpg')
 	img_points, obj_points, nx, ny = utils.get_imgpoints_objpoints()
 	undistorted_image = utils.undistort_image(original_image, obj_points, img_points, nx, ny)
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
@@ -106,7 +106,7 @@ def test_print_data():
 
 
 
-# test_undistort()
+test_undistort()
 # test_abs_sobel_thresh()
 # test_mag_thresh()
 # test_dir_threshold()
@@ -115,7 +115,7 @@ def test_print_data():
 # test_combine_gradient_color()
 # test_warp()
 # test_get_polynomials_curve()
-test_line_curvature()
+# test_line_curvature()
 # test_draw_lines()
 # test_pipeline()
 # test_print_data()

@@ -7,7 +7,7 @@ PATH_CAMERA_CAL = './camera_cal/'
 PATH_TEST_IMAGES = './test_images/'
 
 def test_undistort():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'test5.jpg')
 	img_points, obj_points, nx, ny = utils.get_imgpoints_objpoints()
 	undistorted_image = utils.undistort_image(original_image, obj_points, img_points, nx, ny)
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
@@ -59,7 +59,7 @@ def test_combine_gradient_color():
 	utils.plot_diff_images(original_image, hls_image, True)
 
 def test_get_polynomials_curve():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'test5.jpg')
 	original_image_lines = utils.combine_gradient_color(original_image)
 	warped_image, Minv = utils.warp(original_image_lines)
 	utils.get_polynomials_curve(warped_image)
@@ -106,14 +106,14 @@ def test_print_data():
 
 
 
-# test_undistort()
+test_undistort()
 # test_abs_sobel_thresh()
 # test_mag_thresh()
 # test_dir_threshold()
 # test_get_composed_tresholded_image()
 # test_hls()
 # test_combine_gradient_color()
-test_warp()
+# test_warp()
 # test_get_polynomials_curve()
 # test_line_curvature()
 # test_draw_lines()

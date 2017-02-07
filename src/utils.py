@@ -465,6 +465,6 @@ def plot_diff_images(original_image, undistorted_image, gray):
 		ax2.imshow(undistorted_image, cmap='gray')
 	else: 
 		ax2.imshow(undistorted_image)
-	ax2.set_title('Region of interest - warped and with filter', fontsize=25)
+	ax2.set_title('Undistorded image', fontsize=25)
 	plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 	plt.show()

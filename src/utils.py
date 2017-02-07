@@ -307,29 +307,71 @@ def draw_measured_curvature(image, left_curverad, right_curverad, dst_from_cente
 
 	return image
 
+def add_mask_and_yellow_mask(image):
+	# First convert to HSV 
+	image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+	yellow_hsv_low  = np.array([0, 100, 100])
+	yellow_hsv_high = np.array([50, 255, 255])
+	white_hsv_low  = np.array([20, 0, 180])
+	white_hsv_high = np.array([255, 80, 255])
+
+	# Create the mask
+	mask_yellow = cv2.inRange(image, yellow_hsv_low, yellow_hsv_high)
+	mask_white = cv2.inRange(image, white_hsv_low, white_hsv_high)
+
+	# Combine then into one 
+	mask = cv2.bitwise_or(mask_yellow, mask_white)
+
+	return mask
+
 def get_composed_tresholded_image(image):
-	ksize = 3 # Choose a larger odd number to smooth gradient measurements
+	ksize = 5 # Choose a larger odd number to smooth gradient measurements
+
+	# Get mask
+	mask = add_mask_and_yellow_mask(image)
+
+	# Convert image to HLS space
+	image_HLS = cv2.cvtColor(image,cv2.COLOR_BGR2HLS)
+
+	img_gs = image_HLS[:,:,1]
+	img_abs_x = abs_sobel_thresh(img_gs,'x',5,(50,225))
+	img_abs_y = abs_sobel_thresh(img_gs,'y',5,(50,225))
+	wraped2 = np.copy(cv2.bitwise_or(img_abs_x,img_abs_y))
+
+	img_gs = image_HLS[:,:,2]
+	img_abs_x = abs_sobel_thresh(img_gs,'x',5,(50,255))
+	img_abs_y = abs_sobel_thresh(img_gs,'y',5,(50,255))
+	wraped3 = np.copy(cv2.bitwise_or(img_abs_x,img_abs_y))
+
+
+	# Combine sobel filter information from L and S channels.
+	image_cmb = cv2.bitwise_or(wraped2,wraped3)
+	image_cmb = cv2.GaussianBlur(image_cmb,(5,5),0)
+
+
+	# Combine masks from sobel and color masks.
+	combined = np.zeros_like(image_cmb)
+	combined[(mask>=.5)|(image_cmb>=.5)]=1
+
 
 	# Apply each of the thresholding functions
-	gradx = abs_sobel_thresh(image, orientation='x', sobel_kernel=ksize, thresh=(20, 100))
-	grady = abs_sobel_thresh(image, orientation='y', sobel_kernel=ksize, thresh=(20, 100))
-	mag_binary = mag_thresh(image, sobel_kernel=ksize, thresh=(35, 100))
-	dir_binary = dir_thresh(image, sobel_kernel=ksize, thresh=(0.7, 1.3))
-
-	combined = np.zeros_like(dir_binary)
-	combined[((gradx == 1) & (grady == 1)) & ((mag_binary == 1) & (dir_binary == 1))] = 1
-
-	#combined = np.zeros_like(mag_binary)
-	#combined[((gradx == 1) & (grady == 1)) & (mag_binary == 1)] = 1
+	#gradx = abs_sobel_thresh(image, orientation='x', sobel_kernel=ksize, thresh=(50, 255))
+	#grady = abs_sobel_thresh(image, orientation='y', sobel_kernel=ksize, thresh=(50, 255))
 	
+	#mag_binary = mag_thresh(image, sobel_kernel=ksize, thresh=(35, 100))
+	#dir_binary = dir_thresh(image, sobel_kernel=ksize, thresh=(0.7, 1.3))
+
+	#combined = np.zeros_like(dir_binary)
+
 	return combined
 	
-def abs_sobel_thresh(image, orientation, sobel_kernel=3, thresh=(0, 255)):
+def abs_sobel_thresh(gray_image, orientation, sobel_kernel=3, thresh=(0, 255)):
 	'''
 	Apply SobelX (by default), take the absolute value and apply a threshold to create a binary mask 
 	@return Image with SobelX or SobelY with the defined mask applied
 	''' 
-	gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+	#gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 	# Calcul derivative in the x and y direction
 	sobelx = cv2.Sobel(gray_image, cv2.CV_64F, 1, 0, ksize=sobel_kernel)

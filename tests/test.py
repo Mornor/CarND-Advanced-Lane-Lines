@@ -103,16 +103,19 @@ def test_print_data():
 	result = utils.draw_measured_curvature(result, left_curvrad, right_curvrad, "-0.45")
 	utils.plot_image(result, False)
 
+def test_add_mask_and_yellow_mask():
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'test3.jpg')
+	result = utils.add_mask_and_yellow_mask(original_image)
+	utils.plot_image(result, True)
 
-
-
-test_undistort()
+# test_add_mask_and_yellow_mask()
+#test_undistort()
 # test_abs_sobel_thresh()
 # test_mag_thresh()
 # test_dir_threshold()
 # test_get_composed_tresholded_image()
 # test_hls()
-# test_combine_gradient_color()
+test_combine_gradient_color()
 # test_warp()
 # test_get_polynomials_curve()
 # test_line_curvature()

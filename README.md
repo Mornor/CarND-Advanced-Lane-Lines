@@ -40,7 +40,7 @@ Then, I applied a threshold to the overall magnitude of the gradient, in x and y
 ![mag_thresh](./output_images/mag_thresh.png)
 I then applied a direction gradient of the Y direction of the image (because the lines are mostly vertical in the image) 
 ![dir_grad](./output_images/dir_grad.png)
-Finally I transormed the image into HSV space and combine them with all the steps above, to obtain the following final result: 
+Finally I transormed the image into HLS space and combine them with all the steps above, to obtain the following final result: 
 ![final_transformation](./output_images/combined_thresh_and_color_space.png)
 
 

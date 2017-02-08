@@ -33,9 +33,10 @@ def test_dir_threshold():
 	utils.plot_diff_images(original_image, thresholded_image, True)
 
 def test_get_composed_tresholded_image():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'udacity_test.png')
-	thresholded_image = utils.get_composed_tresholded_image(original_image)
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'frame_issue_5.jpg')
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+	thresholded_image = utils.get_composed_tresholded_image(original_image)
+	#original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 	utils.plot_diff_images(original_image, thresholded_image, True)
 
 def test_warp():
@@ -53,10 +54,10 @@ def test_hls():
 	utils.plot_diff_images(original_image, hls_image, True)
 
 def test_combine_gradient_color():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'test5.jpg')
-	hls_image = utils.combine_gradient_color(original_image)
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'frame_issue_5.jpg')
 	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-	utils.plot_diff_images(original_image, hls_image, True)
+	result = utils.combine_gradient_color(original_image)
+	utils.plot_diff_images(original_image, result, True)
 
 def test_get_polynomials_curve():
 	original_image = cv2.imread(PATH_TEST_IMAGES + 'test5.jpg')
@@ -82,14 +83,15 @@ def test_draw_lines():
 	utils.draw_lines(cv2.cvtColor(undistorted_image, cv2.COLOR_BGR2RGB), warped_image, left_fit, right_fit, Minv)
 
 def test_pipeline():
-	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
-	img_points, obj_points, nx, ny = utils.get_imgpoints_objpoints()
-	undistorted_image = utils.undistort_image(original_image, obj_points, img_points, nx, ny)
-	filtered_image = utils.combine_gradient_color(undistorted_image)
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'test1.jpg')
+	#img_points, obj_points, nx, ny = utils.get_imgpoints_objpoints()
+	#undistorted_image = utils.undistort_image(original_image, obj_points, img_points, nx, ny)
+	filtered_image = utils.combine_gradient_color(original_image)
 	warped_image, Minv = utils.warp(filtered_image)
 	left_fit, right_fit = utils.get_polynomials_curve(warped_image)
-	left_curvrad, right_curvrad = utils.get_line_curvature(warped_image, left_fit, right_fit)
-	result = utils.draw_lines(cv2.cvtColor(undistorted_image, cv2.COLOR_BGR2RGB), warped_image, left_fit, right_fit, Minv)
+	left_curvrad, right_curvrad, center = utils.get_line_curvature(warped_image, left_fit, right_fit)
+	result = utils.draw_lines(cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB), warped_image, left_fit, right_fit, Minv)
+	utils.plot_image(result, False)
 
 def test_print_data(): 
 	original_image = cv2.imread(PATH_TEST_IMAGES + 'straight_lines1.jpg')
@@ -103,14 +105,27 @@ def test_print_data():
 	result = utils.draw_measured_curvature(result, left_curvrad, right_curvrad, "-0.45")
 	utils.plot_image(result, False)
 
+def test_add_mask_and_yellow_mask():
+	original_image = cv2.imread(PATH_TEST_IMAGES + 'frame_issue_5.jpg')
+	original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+	result = utils.add_mask_and_yellow_mask(original_image)
+	utils.plot_image(result, True)
 
+def extract_frame():
+	vidcap = cv2.VideoCapture('project_video.mp4')
+	vidcap.set(cv2.CAP_PROP_POS_MSEC, 41700)      # just cue to 20 sec. position
+	success,image = vidcap.read()
+	if success:
+		cv2.imwrite("frame_issue_5.jpg", image)     # save frame as JPEG file
+		cv2.imshow("20sec",image)
 
-
-test_undistort()
+# extract_frame()
+# test_add_mask_and_yellow_mask()
+# test_undistort()
 # test_abs_sobel_thresh()
 # test_mag_thresh()
 # test_dir_threshold()
-# test_get_composed_tresholded_image()
+test_get_composed_tresholded_image()
 # test_hls()
 # test_combine_gradient_color()
 # test_warp()

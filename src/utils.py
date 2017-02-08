@@ -192,21 +192,20 @@ def slice_image(image, slices=10):
 
 
 def combine_gradient_color(image):
-	'''
-	Combine gradient thresholds and color space to get the best result.
-	All the techniques are combined to better detect the lines
-	'''
+	#Combine gradient thresholds and color space to get the best result.
+	#All the techniques are combined to better detect the lines
+	
 	rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 	# Get the image with combined thresholds applied
-	combined_thresholds_image = get_composed_tresholded_image(image)
+	combined_thresholds_image = get_composed_tresholded_image(rgb_image)
 
 	# Get hls image
-	hls_image = hls_select(rgb_image, thresh=(170, 255))
+	hls_image = hls_select(rgb_image, thresh=(90, 255))
 
 	# Return the combination of both transformation
 	result = np.zeros_like(hls_image)
-	result[(combined_thresholds_image == 1) | (hls_image == 1)] = 1
+	result[(combined_thresholds_image == 1) | (hls_image == 1) ] = 1
 	return result
 
 
@@ -307,23 +306,56 @@ def draw_measured_curvature(image, left_curverad, right_curverad, dst_from_cente
 
 	return image
 
+def color_mask(hsv,low,high):
+	# Return mask from HSV 
+	mask = cv2.inRange(hsv, low, high)
+	return mask
+
+def apply_color_mask(hsv,img,low,high):
+	# Apply color mask to image
+	mask = cv2.inRange(hsv, low, high)
+	res = cv2.bitwise_and(img,img, mask= mask)
+	return res
+
+def add_mask_and_yellow_mask(image):
+	# First convert to HSV 
+	image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+
+	yellow_hsv_low  = np.array([0, 100, 100])
+	yellow_hsv_high = np.array([80, 255, 255])
+	white_hsv_low  = np.array([0, 0, 160])
+	white_hsv_high = np.array([255, 255, 255])
+
+	# Create the mask
+	mask_yellow = color_mask(image, yellow_hsv_low, yellow_hsv_high)
+	#mask_yellow = apply_color_mask(image, image, yellow_hsv_low, yellow_hsv_high)
+
+	mask_white = color_mask(image, white_hsv_low, white_hsv_high)
+	#mask_white = apply_color_mask(image, image, white_hsv_low, white_hsv_high)
+
+	# Combine then into one 
+	mask = cv2.bitwise_or(mask_yellow, mask_white)
+
+	return mask
+
 def get_composed_tresholded_image(image):
 	ksize = 3 # Choose a larger odd number to smooth gradient measurements
 
+	bgr_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
 	# Apply each of the thresholding functions
-	gradx = abs_sobel_thresh(image, orientation='x', sobel_kernel=ksize, thresh=(20, 100))
-	grady = abs_sobel_thresh(image, orientation='y', sobel_kernel=ksize, thresh=(20, 100))
-	mag_binary = mag_thresh(image, sobel_kernel=ksize, thresh=(35, 100))
-	dir_binary = dir_thresh(image, sobel_kernel=ksize, thresh=(0.7, 1.3))
+	gradx = abs_sobel_thresh(bgr_image, orientation='x', sobel_kernel=ksize, thresh=(20, 100))
+	grady = abs_sobel_thresh(bgr_image, orientation='y', sobel_kernel=ksize, thresh=(20, 100))
+	mag_binary = mag_thresh(bgr_image, sobel_kernel=ksize, thresh=(35, 100))
+	dir_binary = dir_thresh(bgr_image, sobel_kernel=ksize, thresh=(0.7, 1.3))
+
+	mask_yellow_white = add_mask_and_yellow_mask(image)
 
 	combined = np.zeros_like(dir_binary)
-	combined[((gradx == 1) & (grady == 1)) & ((mag_binary == 1) & (dir_binary == 1))] = 1
-
-	#combined = np.zeros_like(mag_binary)
-	#combined[((gradx == 1) & (grady == 1)) & (mag_binary == 1)] = 1
+	combined[((gradx == 1) & (grady == 1)) | ((mag_binary == 1) & (dir_binary == 1)) & (mask_yellow_white == 1)] = 1
 	
 	return combined
-	
+
 def abs_sobel_thresh(image, orientation, sobel_kernel=3, thresh=(0, 255)):
 	'''
 	Apply SobelX (by default), take the absolute value and apply a threshold to create a binary mask 

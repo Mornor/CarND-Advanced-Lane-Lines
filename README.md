@@ -69,3 +69,10 @@ A second degre polynomial is computed to fit the line curvature.
 * Warp the detected lane boundaries back onto the original image.
 The detected line section is finally drawn onto the original image.
 ![final_result](./output_images/final_result.png) 
+
+### Discussion. 
+I do think the different masks applied to the original image could be fine-tuned. Indeed, in some images, the lines are not so-well detected. Since it is only for one or 2 frames, it does not present a danger to the vehicle. <br>
+It was difficult to find an otpimal region of interest to do a perspective transform. So far, the source and destination points are hard-coded and make that dynamic would certainly improve the accuracy of the `warp()` function. However, I have not been able to do so.  
+Several frame were really difficult to process. These frame are all named `frame_issue_*.jpg` in `./test_images/` For example the following one: 
+![hard](./output_images/frame_issue5.jpg)
+I managed to get a good result by adding a mask which will detect both the yellow color and the wight color of the image.  
